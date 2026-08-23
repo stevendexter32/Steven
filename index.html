@@ -224,7 +224,7 @@
     @media print {
       body { background:#fff !important; color:#111 !important; }
       .deco-circle, .grid-lines, .cursor-glow,
-      .hero-btns, #print-overlay, footer a svg { display:none !important; }
+      .hero-btns, #print-overlay, footer a svg, #upload { display:none !important; }
       .page-wrap { max-width:100%; padding:0 1.5cm; }
       #hero {
         grid-template-columns:1fr 200px;
@@ -352,6 +352,39 @@
     .available-dot {
       width:6px; height:6px; border-radius:50%;
       background:#4ade80; animation:blink 2s infinite;
+    }
+
+    /* ═══════════════════════════════════════
+       UPLOAD SECTION
+    ═══════════════════════════════════════ */
+    #upload {
+      padding:4rem 0;
+    }
+    .upload-card {
+      background:var(--card-bg);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:1.8rem;
+      max-width:520px;
+    }
+    .upload-card p.desc {
+      font-size:.85rem; color:var(--muted); margin-bottom:1.4rem; line-height:1.7;
+    }
+    .upload-field {
+      width:100%; padding:.75rem .9rem; margin-bottom:.9rem;
+      border-radius:8px; border:1px solid var(--border);
+      background:var(--bg3); color:var(--white);
+      font-family:'Inter', sans-serif; font-size:.85rem;
+    }
+    .upload-field::placeholder { color:var(--muted); }
+    .upload-check {
+      display:flex; align-items:center; gap:.6rem;
+      font-size:.8rem; color:var(--muted);
+      margin-bottom:1.4rem; cursor:pointer;
+    }
+    .upload-check input { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; }
+    #uploadStatus {
+      font-size:.8rem; margin-top:.9rem; min-height:1.2em;
     }
 
     /* ═══════════════════════════════════════
@@ -584,6 +617,7 @@
       .photo-frame { width:220px; height:260px; }
       .phones-card { grid-column:span 1; }
       .phones-grid { grid-template-columns:1fr; }
+      .upload-card { margin:0 auto; }
     }
 
     @media(max-width:600px) {
@@ -707,23 +741,23 @@
   </section>
 
   <!-- ══════════════ UPLOAD ══════════════ -->
-  <section id="upload" style="padding:4rem 0;">
+  <section id="upload">
     <div class="section-header reveal">
       <span class="section-eyebrow">Partage de fichier</span>
       <h2 class="section-title">M'envoyer un <span>fichier</span></h2>
     </div>
-    <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:1.8rem; max-width:500px;">
-      <p style="font-size:.85rem; color:var(--muted); margin-bottom:1.2rem;">
-        Pas de WhatsApp ou d'email sous la main ? Envoie-moi ton fichier directement ici.
+    <div class="upload-card reveal">
+      <p class="desc">
+        Pas de WhatsApp ou d'email sous la main ? Envoie-moi ton fichier directement ici — CV, document, photo, tout format accepté.
       </p>
-      <input type="text" id="uploaderName" placeholder="Ton nom" style="width:100%; padding:.7rem; margin-bottom:.8rem; border-radius:8px; border:1px solid var(--border); background:var(--bg3); color:var(--white);">
-      <input type="file" id="fileInput" style="width:100%; padding:.5rem; margin-bottom:.8rem; color:var(--white);">
-      <label style="display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:var(--muted); margin-bottom:1.2rem;">
+      <input type="text" id="uploaderName" class="upload-field" placeholder="Ton nom">
+      <input type="file" id="fileInput" class="upload-field">
+      <label class="upload-check">
         <input type="checkbox" id="privateCheck">
         Fichier privé (visible par moi seul)
       </label>
       <button onclick="uploadFile()" class="btn btn-blue" style="width:100%; justify-content:center;">Envoyer</button>
-      <p id="uploadStatus" style="font-size:.8rem; margin-top:.8rem; color:var(--accent2);"></p>
+      <p id="uploadStatus"></p>
     </div>
   </section>
 
@@ -887,6 +921,54 @@
   document.getElementById('print-overlay').addEventListener('click', function(e) {
     if (e.target === this) hidePrintOverlay();
   });
+
+  // Upload de fichier
+  async function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const nameInput = document.getElementById('uploaderName');
+    const privateCheck = document.getElementById('privateCheck');
+    const status = document.getElementById('uploadStatus');
+
+    if (!fileInput.files[0]) {
+      status.textContent = "Choisis d'abord un fichier.";
+      status.style.color = '#ff9a9a';
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const uploaderName = nameInput.value.trim() || 'Anonyme';
+    const visibility = privateCheck.checked ? 'private' : 'public';
+
+    status.textContent = 'Envoi en cours...';
+    status.style.color = '#7ab3ff';
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'x-filename': file.name,
+          'x-visibility': visibility,
+          'x-uploader': uploaderName,
+          'Content-Type': 'application/octet-stream'
+        },
+        body: file
+      });
+
+      if (res.ok) {
+        status.textContent = '✅ Fichier envoyé avec succès !';
+        status.style.color = '#7ee89a';
+        fileInput.value = '';
+        nameInput.value = '';
+        privateCheck.checked = false;
+      } else {
+        status.textContent = "❌ Erreur lors de l'envoi.";
+        status.style.color = '#ff9a9a';
+      }
+    } catch (err) {
+      status.textContent = "❌ Erreur réseau.";
+      status.style.color = '#ff9a9a';
+    }
+  }
 </script>
 </body>
 </html>
