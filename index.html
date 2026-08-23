@@ -706,6 +706,27 @@
 
   </section>
 
+  <!-- ══════════════ UPLOAD ══════════════ -->
+  <section id="upload" style="padding:4rem 0;">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">Partage de fichier</span>
+      <h2 class="section-title">M'envoyer un <span>fichier</span></h2>
+    </div>
+    <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:1.8rem; max-width:500px;">
+      <p style="font-size:.85rem; color:var(--muted); margin-bottom:1.2rem;">
+        Pas de WhatsApp ou d'email sous la main ? Envoie-moi ton fichier directement ici.
+      </p>
+      <input type="text" id="uploaderName" placeholder="Ton nom" style="width:100%; padding:.7rem; margin-bottom:.8rem; border-radius:8px; border:1px solid var(--border); background:var(--bg3); color:var(--white);">
+      <input type="file" id="fileInput" style="width:100%; padding:.5rem; margin-bottom:.8rem; color:var(--white);">
+      <label style="display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:var(--muted); margin-bottom:1.2rem;">
+        <input type="checkbox" id="privateCheck">
+        Fichier privé (visible par moi seul)
+      </label>
+      <button onclick="uploadFile()" class="btn btn-blue" style="width:100%; justify-content:center;">Envoyer</button>
+      <p id="uploadStatus" style="font-size:.8rem; margin-top:.8rem; color:var(--accent2);"></p>
+    </div>
+  </section>
+
   <!-- ══════════════ CONTACT ══════════════ -->
   <section id="contact">
     <div class="section-header reveal">
