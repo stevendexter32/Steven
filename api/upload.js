@@ -16,11 +16,11 @@ module.exports = async (req, res) => {
 
     const safeName = `${Date.now()}-${filename}`.replace(/[^a-zA-Z0-9.\-_]/g, '_');
     const blob = await put(`uploads/${safeName}`, buffer, {
-      access: 'public',
+      access: 'private',
       addRandomSuffix: false,
     });
 
-    const metaBlob = await put(
+    await put(
       `meta/${safeName}.json`,
       JSON.stringify({
         name: filename,
@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
         uploader: uploaderName,
         date: new Date().toISOString(),
       }),
-      { access: 'public', addRandomSuffix: false, contentType: 'application/json' }
+      { access: 'private', addRandomSuffix: false, contentType: 'application/json' }
     );
 
     res.status(200).json({ success: true });
