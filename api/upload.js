@@ -15,9 +15,11 @@ module.exports = async (req, res) => {
     const buffer = Buffer.concat(chunks);
 
     const safeName = `${Date.now()}-${filename}`.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+
     const blob = await put(`uploads/${safeName}`, buffer, {
-      access: 'private',
+      access: 'public',
       addRandomSuffix: false,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
     await put(
@@ -30,13 +32,18 @@ module.exports = async (req, res) => {
         uploader: uploaderName,
         date: new Date().toISOString(),
       }),
-      { access: 'private', addRandomSuffix: false, contentType: 'application/json' }
+      {
+        access: 'public',
+        addRandomSuffix: false,
+        contentType: 'application/json',
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      }
     );
 
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erreur upload' });
+    console.error('UPLOAD ERROR:', err.message);
+    res.status(500).json({ error: err.message });
   }
 };
 
