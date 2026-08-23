@@ -11,17 +11,28 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Non autorisé' });
     }
 
-    const { filePath, metaPath } = req.body;
+    let body = req.body;
+    if (!body || typeof body === 'string') {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      body = JSON.parse(Buffer.concat(chunks).toString() || '{}');
+    }
+
+    const { filePath, metaPath } = body;
     if (!filePath || !metaPath) {
       return res.status(400).json({ error: 'Chemins manquants' });
     }
 
-    await del(filePath);
-    await del(metaPath);
+    await del(filePath, { token: process.env.BLOB_READ_WRITE_TOKEN });
+    await del(metaPath, { token: process.env.BLOB_READ_WRITE_TOKEN });
 
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erreur suppression' });
+    console.error('DELETE ERROR:', err.message);
+    res.status(500).json({ error: err.message });
   }
+};
+
+module.exports.config = {
+  api: { bodyParser: false },
 };
