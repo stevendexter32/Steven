@@ -24,20 +24,23 @@
 </head>
 <body>
 
-<a href="index.html" class="back-link">← Retour au site / Créateur</a>
+<a href="index.html" class="back-link">← Retour au portfolio</a>
 
-<h1>🔑 Espace Admin</h1>
-<p class="sub">Entrez votre clé d'accès pour afficher la liste des fichiers créés, les télécharger ou les supprimer.</p>
+<h1>🔑 Espace Admin Sécurisé</h1>
+<p class="sub">Entrez votre clé d'accès administrateur pour lister, télécharger ou supprimer les fichiers.</p>
 
 <div id="login">
   <input type="password" id="pwd" placeholder="Clé d'accès admin">
-  <button onclick="loadFiles()">Valider</button>
+  <button onclick="loadFiles()">Se connecter</button>
   <p id="loginError" style="color:#ff9a9a; font-size:.8rem; margin-top:.5rem;"></p>
 </div>
 
 <div id="filesContainer" style="display:none;">
-  <h2>📁 Fichiers enregistrés</h2>
-  <div id="files" style="margin-top:1rem;"></div>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+    <h2>📁 Fichiers enregistrés</h2>
+    <button onclick="logout()" style="background:#333; font-size:.75rem; padding:.4rem .8rem;">Déconnexion</button>
+  </div>
+  <div id="files"></div>
 </div>
 
 <script>
@@ -47,6 +50,7 @@
     errorEl.textContent = "Vérification...";
 
     try {
+      // Vérification réelle du mot de passe auprès de l'API list.js (qui compare avec process.env.ADMIN_PASSWORD)
       const res = await fetch('/api/list', {
         headers: { 'x-admin-password': pwd }
       });
@@ -57,6 +61,7 @@
       }
 
       const data = await res.json();
+      // On mémorise le mot de passe uniquement si l'API a validé qu'il est correct
       localStorage.setItem('admin_pwd', pwd);
       
       document.getElementById('login').style.display = 'none';
@@ -93,19 +98,30 @@
   async function deleteFile(filePath, metaPath) {
     if (!confirm('Voulez-vous vraiment supprimer ce fichier définitivement ?')) return;
     const pwd = localStorage.getItem('admin_pwd');
-    const res = await fetch('/api/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-password': pwd },
-      body: JSON.stringify({ filePath, metaPath })
-    });
-    if (res.ok) {
-      loadFiles();
-    } else {
-      alert('Erreur lors de la suppression');
+    
+    try {
+      const res = await fetch('/api/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': pwd },
+        body: JSON.stringify({ filePath, metaPath })
+      });
+      
+      if (res.ok) {
+        loadFiles();
+      } else {
+        alert('Erreur lors de la suppression : clé invalide ou fichier introuvable.');
+      }
+    } catch (err) {
+      alert('Erreur réseau lors de la suppression.');
     }
   }
 
-  // Connexion automatique si le mot de passe est déjà en mémoire
+  function logout() {
+    localStorage.removeItem('admin_pwd');
+    location.reload();
+  }
+
+  // Vérification au chargement si un mot de passe était sauvegardé
   const saved = localStorage.getItem('admin_pwd');
   if (saved) {
     document.getElementById('pwd').value = saved;
