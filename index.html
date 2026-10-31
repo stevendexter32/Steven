@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mes documents — KOERA Alain Steven</title>
+  <title>KOERA Alain Steven — Portfolio</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
+    /* ═══════════════════════════════════════
+       VARIABLES
+    ═══════════════════════════════════════ */
     :root {
       --bg:        #0b0e13;
       --bg2:       #111520;
@@ -19,23 +22,517 @@
       --card-bg:   rgba(255,255,255,.03);
       --r:         .35s cubic-bezier(.4,0,.2,1);
     }
+
+    /* ═══════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════ */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    [hidden] { display:none !important; }
     html { scroll-behavior:smooth; font-size:16px; }
     body {
       font-family:'Inter', sans-serif;
-      background:var(--bg); color:var(--white);
-      overflow-x:hidden; line-height:1.6;
-    }
-    .page-wrap {
-      position:relative; z-index:1;
-      max-width:1100px; margin:0 auto; padding:0 2rem;
+      background:var(--bg);
+      color:var(--white);
+      overflow-x:hidden;
+      line-height:1.6;
     }
 
-    /* Décorations (comme le portfolio) */
-    .deco-circle { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(100px); }
-    .deco-1 { width:500px; height:500px; top:-150px; right:-100px; background:rgba(79,142,247,.07); }
-    .deco-2 { width:400px; height:400px; bottom:-100px; left:-100px; background:rgba(226,185,106,.05); }
+    /* ═══════════════════════════════════════
+       NOISE OVERLAY
+    ═══════════════════════════════════════ */
+    body::before {
+      content:'';
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      opacity:.025;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size:200px;
+    }
+
+    /* ═══════════════════════════════════════
+       CURSOR GLOW
+    ═══════════════════════════════════════ */
+    .cursor-glow {
+      position:fixed; pointer-events:none; z-index:0;
+      width:600px; height:600px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(79,142,247,.06) 0%, transparent 70%);
+      transform:translate(-50%,-50%);
+      transition:opacity .4s;
+    }
+
+    /* ═══════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════ */
+    .page-wrap {
+      position:relative; z-index:1;
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 2rem;
+    }
+
+    /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+    #hero {
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:1fr 420px;
+      align-items:center;
+      gap:4rem;
+      padding:6rem 0 4rem;
+      position:relative;
+    }
+
+    /* Ligne décorative verticale */
+    #hero::before {
+      content:'';
+      position:absolute; left:50%; top:10%; bottom:10%;
+      width:1px;
+      background:linear-gradient(to bottom, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+      opacity:.15;
+    }
+
+    /* ─ Texte gauche ─ */
+    .hero-left { position:relative; }
+
+    .hero-tag {
+      display:inline-flex; align-items:center; gap:.5rem;
+      font-size:.68rem; letter-spacing:.3em; text-transform:uppercase;
+      color:var(--accent2);
+      border:1px solid rgba(79,142,247,.25);
+      background:rgba(79,142,247,.06);
+      padding:.35rem 1rem; margin-bottom:2rem;
+      border-radius:100px;
+      animation:slideIn .8s ease .1s both;
+    }
+    .hero-tag-dot {
+      width:5px; height:5px; border-radius:50%;
+      background:var(--accent);
+      animation:blink 2s infinite;
+    }
+
+    .hero-name {
+      font-family:'Syne', sans-serif;
+      font-size:clamp(2.8rem,6vw,5rem);
+      font-weight:800;
+      line-height:1.0;
+      margin-bottom:.5rem;
+      animation:slideIn .8s ease .2s both;
+    }
+    .hero-name .first { color:var(--white); }
+    .hero-name .last {
+      color:transparent;
+      -webkit-text-stroke:1.5px rgba(240,244,255,.5);
+      display:block;
+    }
+
+    .hero-role {
+      font-family:'Syne', sans-serif;
+      font-size:1rem; font-weight:500;
+      color:var(--gold); letter-spacing:.15em; text-transform:uppercase;
+      margin-bottom:1.5rem;
+      animation:slideIn .8s ease .3s both;
+    }
+
+    .hero-bio {
+      font-size:.9rem; line-height:1.85;
+      color:var(--muted); max-width:440px;
+      margin-bottom:2.5rem;
+      animation:slideIn .8s ease .4s both;
+    }
+
+    .hero-btns {
+      display:flex; gap:1rem; flex-wrap:wrap;
+      animation:slideIn .8s ease .5s both;
+    }
+
+    .btn {
+      display:inline-flex; align-items:center; gap:.5rem;
+      font-family:'Syne', sans-serif;
+      font-size:.75rem; font-weight:600;
+      letter-spacing:.12em; text-transform:uppercase;
+      text-decoration:none; padding:.8rem 1.8rem;
+      border-radius:6px; transition:all var(--r);
+      cursor:pointer; border:none;
+    }
+    .btn-blue {
+      background:var(--accent);
+      color:#fff;
+      box-shadow:0 4px 24px rgba(79,142,247,.3);
+    }
+    .btn-blue:hover {
+      background:var(--accent2);
+      transform:translateY(-2px);
+      box-shadow:0 8px 32px rgba(79,142,247,.4);
+    }
+    .btn-outline {
+      background:transparent;
+      color:var(--white);
+      border:1px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color:rgba(79,142,247,.4);
+      color:var(--accent2);
+      background:rgba(79,142,247,.05);
+    }
+    .btn-pdf {
+      background:transparent;
+      color:var(--gold);
+      border:1px solid rgba(226,185,106,.35);
+    }
+    .btn-pdf:hover {
+      background:rgba(226,185,106,.08);
+      border-color:var(--gold);
+      transform:translateY(-2px);
+    }
+    .btn-pdf svg { transition:transform var(--r); }
+    .btn-pdf:hover svg { transform:translateY(2px); }
+
+    /* ── Overlay impression ── */
+    #print-overlay {
+      position:fixed; inset:0; z-index:500;
+      background:rgba(11,14,19,.85);
+      backdrop-filter:blur(6px);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none;
+      transition:opacity .3s;
+    }
+    #print-overlay.show { opacity:1; pointer-events:all; }
+    .print-box {
+      background:var(--bg2);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:2.5rem 3rem;
+      text-align:center;
+      max-width:380px; width:90%;
+      transform:translateY(20px);
+      transition:transform .3s;
+    }
+    #print-overlay.show .print-box { transform:none; }
+    .print-box-icon { font-size:2.5rem; margin-bottom:1rem; }
+    .print-box h3 {
+      font-family:'Syne',sans-serif;
+      font-size:1.2rem; font-weight:700;
+      color:var(--white); margin-bottom:.5rem;
+    }
+    .print-box p {
+      font-size:.82rem; color:var(--muted);
+      line-height:1.7; margin-bottom:1.8rem;
+    }
+    .print-box-btns { display:flex; gap:.8rem; justify-content:center; }
+
+    /* ── Styles impression ── */
+    @media print {
+      body { background:#fff !important; color:#111 !important; }
+      .deco-circle, .grid-lines, .cursor-glow,
+      .hero-btns, #print-overlay, footer a svg { display:none !important; }
+      .page-wrap { max-width:100%; padding:0 1.5cm; }
+      #hero {
+        grid-template-columns:1fr 200px;
+        min-height:auto; gap:2rem;
+        padding:1cm 0 .5cm;
+      }
+      .hero-name { font-size:2.2rem; }
+      .hero-name .last { -webkit-text-stroke:1px #333; color:transparent; }
+      .hero-role { color:#555; }
+      .hero-bio { color:#444; }
+      .hero-tag { border-color:#ccc; color:#555; background:none; }
+      .hero-tag-dot { background:#555; }
+      .hero-stats { border-top:1px solid #ddd; }
+      .stat-num { color:#1a5cd6; }
+      .stat-lbl { color:#666; }
+      .photo-frame::before { display:none; }
+      .photo-inner { border-radius:12px; border:2px solid #ddd; }
+      .available-badge { background:#f0f0f0; color:#444; border-color:#ccc; }
+      .available-dot { background:#2a9d4a; }
+      #contact { padding:1cm 0; }
+      .section-title { color:#111; }
+      .section-title span { color:#1a5cd6; }
+      .section-eyebrow { color:#1a5cd6; }
+      .contact-grid { gap:.5rem; }
+      .contact-card {
+        border:1px solid #ddd !important;
+        background:#fafafa !important;
+        box-shadow:none !important;
+        transform:none !important;
+        break-inside:avoid;
+      }
+      .contact-card::before { display:none; }
+      .contact-value { color:#111 !important; }
+      .contact-label { color:#777 !important; }
+      .contact-arrow { color:#aaa !important; }
+      .phones-card { border:1px solid #ddd; background:#fafafa; break-inside:avoid; }
+      .phone-item { border:1px solid #ddd; background:#f5f5f5; }
+      .phone-num { color:#111; }
+      .phones-title { color:#777; }
+      footer { border-top:1px solid #ddd; }
+      footer p { color:#666; }
+      footer a { color:#1a5cd6; }
+      a { text-decoration:none; }
+    }
+
+    /* ─ Stats rapides ─ */
+    .hero-stats {
+      display:flex; gap:2rem;
+      margin-top:3rem; padding-top:2rem;
+      border-top:1px solid var(--border);
+      animation:slideIn .8s ease .6s both;
+    }
+    .stat { text-align:center; }
+    .stat-num {
+      font-family:'Syne', sans-serif;
+      font-size:1.8rem; font-weight:800;
+      color:var(--accent2); line-height:1;
+    }
+    .stat-lbl {
+      font-size:.65rem; letter-spacing:.15em;
+      text-transform:uppercase; color:var(--muted);
+      margin-top:.3rem;
+    }
+
+    /* ─ Photo droite ─ */
+    .hero-right {
+      display:flex; flex-direction:column;
+      align-items:center; gap:1.5rem;
+      animation:slideInRight .8s ease .3s both;
+    }
+
+    .photo-frame {
+      position:relative;
+      width:280px; height:320px;
+    }
+
+    /* Bordure animée */
+    .photo-frame::before {
+      content:'';
+      position:absolute; inset:-3px;
+      border-radius:20px;
+      background:linear-gradient(135deg, var(--accent), var(--gold), var(--accent));
+      background-size:300% 300%;
+      animation:gradientShift 4s ease infinite;
+      z-index:0;
+    }
+
+    .photo-inner {
+      position:relative; z-index:1;
+      width:100%; height:100%;
+      border-radius:18px;
+      overflow:hidden;
+      background:var(--bg3);
+    }
+
+    .photo-inner img {
+      width:100%; height:100%;
+      object-fit:cover; object-position:top center;
+      display:block;
+    }
+
+    /* Placeholder si pas de photo */
+    .photo-placeholder {
+      width:100%; height:100%;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:.8rem; background:var(--bg3);
+      color:var(--muted);
+    }
+    .photo-placeholder svg { width:48px; height:48px; opacity:.3; }
+    .photo-placeholder p { font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; opacity:.4; }
+
+    /* Badge disponibilité */
+    .available-badge {
+      position:absolute; bottom:-14px; left:50%; transform:translateX(-50%);
+      background:var(--bg2);
+      border:1px solid rgba(79,142,247,.3);
+      border-radius:100px;
+      padding:.4rem 1rem;
+      font-size:.65rem; letter-spacing:.15em; text-transform:uppercase;
+      color:var(--accent2);
+      white-space:nowrap; z-index:2;
+      display:flex; align-items:center; gap:.4rem;
+    }
+    .available-dot {
+      width:6px; height:6px; border-radius:50%;
+      background:#4ade80; animation:blink 2s infinite;
+    }
+
+    /* ═══════════════════════════════════════
+       CONTACT SECTION
+    ═══════════════════════════════════════ */
+    #contact {
+      padding:6rem 0 8rem;
+    }
+
+    .section-header {
+      margin-bottom:3.5rem;
+    }
+    .section-eyebrow {
+      font-size:.65rem; letter-spacing:.3em; text-transform:uppercase;
+      color:var(--accent); display:block; margin-bottom:.6rem;
+    }
+    .section-title {
+      font-family:'Syne', sans-serif;
+      font-size:clamp(1.8rem,3vw,2.8rem);
+      font-weight:800; line-height:1.1;
+    }
+    .section-title span { color:var(--accent); }
+
+    /* Grille contacts */
+    .contact-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+      gap:1rem;
+    }
+
+    .contact-card {
+      background:var(--card-bg);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:1.4rem 1.6rem;
+      display:flex; align-items:center; gap:1.2rem;
+      text-decoration:none; color:inherit;
+      transition:all var(--r);
+      position:relative; overflow:hidden;
+    }
+    .contact-card::before {
+      content:'';
+      position:absolute; inset:0;
+      background:linear-gradient(135deg, rgba(79,142,247,.05) 0%, transparent 60%);
+      opacity:0; transition:opacity var(--r);
+    }
+    .contact-card:hover {
+      border-color:rgba(79,142,247,.35);
+      transform:translateY(-3px);
+      box-shadow:0 12px 36px rgba(0,0,0,.3);
+    }
+    .contact-card:hover::before { opacity:1; }
+
+    .contact-icon-wrap {
+      width:46px; height:46px; border-radius:12px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.3rem;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      transition:all var(--r);
+    }
+    .contact-card:hover .contact-icon-wrap {
+      background:rgba(79,142,247,.1);
+      border-color:rgba(79,142,247,.3);
+    }
+
+    .contact-info { flex:1; min-width:0; }
+    .contact-label {
+      font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+      color:var(--muted); margin-bottom:.2rem;
+    }
+    .contact-value {
+      font-size:.88rem; font-weight:500;
+      color:var(--white); word-break:break-all;
+      line-height:1.4;
+    }
+    .contact-value small {
+      display:block; font-size:.75rem;
+      color:var(--muted); font-weight:400;
+      margin-top:.1rem;
+    }
+
+    .contact-arrow {
+      color:var(--muted); font-size:.8rem;
+      transition:all var(--r); flex-shrink:0;
+    }
+    .contact-card:hover .contact-arrow {
+      color:var(--accent2); transform:translateX(3px);
+    }
+
+    /* Couleurs spécifiques */
+    .card-orange .contact-icon-wrap { background:rgba(255,132,0,.08); border-color:rgba(255,132,0,.2); }
+    .card-green  .contact-icon-wrap { background:rgba(37,211,102,.08); border-color:rgba(37,211,102,.2); }
+    .card-blue   .contact-icon-wrap { background:rgba(0,136,204,.08);  border-color:rgba(0,136,204,.2); }
+    .card-sky    .contact-icon-wrap { background:rgba(29,161,242,.08);  border-color:rgba(29,161,242,.2); }
+    .card-in     .contact-icon-wrap { background:rgba(10,102,194,.08);  border-color:rgba(10,102,194,.2); }
+    .card-mail   .contact-icon-wrap { background:rgba(79,142,247,.08);  border-color:rgba(79,142,247,.2); }
+    .card-fb    .contact-icon-wrap { background:rgba(24,119,242,.08);  border-color:rgba(24,119,242,.2); }
+
+    /* Section téléphones étendue */
+    .phones-card {
+      background:var(--card-bg);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:1.6rem;
+      grid-column:span 2;
+    }
+    .phones-header {
+      display:flex; align-items:center; gap:1rem;
+      margin-bottom:1.2rem;
+    }
+    .phones-icon-wrap {
+      width:46px; height:46px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.3rem;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--border);
+    }
+    .phones-title {
+      font-size:.6rem; letter-spacing:.2em;
+      text-transform:uppercase; color:var(--muted);
+    }
+    .phones-grid {
+      display:grid; grid-template-columns:repeat(2,1fr);
+      gap:.8rem;
+    }
+    .phone-item {
+      display:flex; align-items:center; gap:.8rem;
+      padding:.8rem 1rem;
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--border); border-radius:10px;
+      text-decoration:none; color:var(--white);
+      transition:all var(--r);
+    }
+    .phone-item:hover {
+      border-color:rgba(79,142,247,.3);
+      background:rgba(79,142,247,.04);
+      transform:translateX(4px);
+    }
+    .phone-carrier {
+      font-size:.62rem; font-weight:600;
+      letter-spacing:.12em; text-transform:uppercase;
+      padding:.2rem .6rem; border-radius:4px;
+      flex-shrink:0;
+    }
+    .carrier-orange { background:rgba(255,132,0,.15); color:#ff8400; }
+    .carrier-yas    { background:rgba(79,142,247,.15); color:var(--accent2); }
+    .carrier-airtel { background:rgba(220,50,50,.15);  color:#e85555; }
+    .phone-num { font-size:.88rem; font-weight:500; }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    footer {
+      border-top:1px solid var(--border);
+      padding:2rem 0;
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:1rem;
+    }
+    footer p {
+      font-size:.75rem; color:var(--muted);
+    }
+    footer a { color:var(--accent); text-decoration:none; }
+
+    /* ═══════════════════════════════════════
+       DÉCORATIONS
+    ═══════════════════════════════════════ */
+    .deco-circle {
+      position:fixed; border-radius:50%; pointer-events:none; z-index:0;
+      filter:blur(100px);
+    }
+    .deco-1 {
+      width:500px; height:500px; top:-150px; right:-100px;
+      background:rgba(79,142,247,.07);
+    }
+    .deco-2 {
+      width:400px; height:400px; bottom:-100px; left:-100px;
+      background:rgba(226,185,106,.05);
+    }
+
+    /* Grid lines subtiles */
     .grid-lines {
       position:fixed; inset:0; z-index:0; pointer-events:none;
       background-image:
@@ -44,924 +541,328 @@
       background-size:60px 60px;
     }
 
-    /* Boutons */
-    .btn {
-      display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-      font-family:'Syne', sans-serif; font-size:.75rem; font-weight:600;
-      letter-spacing:.12em; text-transform:uppercase; text-decoration:none;
-      padding:.8rem 1.6rem; border-radius:6px; transition:all var(--r);
-      cursor:pointer; border:none;
+    /* ═══════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════ */
+    @keyframes slideIn {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
     }
-    .btn-blue { background:var(--accent); color:#fff; box-shadow:0 4px 24px rgba(79,142,247,.3); }
-    .btn-blue:hover { background:var(--accent2); transform:translateY(-2px); }
-    .btn-outline { background:transparent; color:var(--white); border:1px solid var(--border); }
-    .btn-outline:hover { border-color:rgba(79,142,247,.4); color:var(--accent2); background:rgba(79,142,247,.05); }
-    .btn-danger { background:transparent; color:#ff9a9a; border:1px solid rgba(255,154,154,.35); }
-    .btn-danger:hover { background:rgba(255,154,154,.08); border-color:#ff9a9a; }
-    .btn:disabled { opacity:.5; cursor:wait; transform:none; }
-    .btn-sm { padding:.55rem 1rem; font-size:.68rem; }
-
-    .topbar { padding:1.6rem 0 0; }
-
-    section { padding:3rem 0 1rem; }
-    .section-header { margin-bottom:2rem; }
-    .section-eyebrow {
-      font-size:.65rem; letter-spacing:.3em; text-transform:uppercase;
-      color:var(--accent); display:block; margin-bottom:.6rem;
+    @keyframes slideInRight {
+      from { opacity:0; transform:translateX(30px); }
+      to   { opacity:1; transform:translateX(0); }
     }
-    .section-title {
-      font-family:'Syne', sans-serif; font-size:clamp(1.8rem,3vw,2.8rem);
-      font-weight:800; line-height:1.1;
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    .section-title span { color:var(--accent); }
-
-    /* Choix du type */
-    .type-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin-bottom:1.5rem; }
-    .type-card {
-      background:var(--card-bg); border:1px solid var(--border); border-radius:14px;
-      padding:1.4rem 1rem; text-align:center; color:var(--white); cursor:pointer;
-      font-family:'Inter', sans-serif; transition:all var(--r);
-    }
-    .type-card:hover { border-color:rgba(79,142,247,.35); transform:translateY(-3px); }
-    .type-card.active { border-color:var(--accent); background:rgba(79,142,247,.08); }
-    .badge {
-      width:48px; height:48px; border-radius:10px; margin:0 auto .7rem;
-      display:flex; align-items:center; justify-content:center;
-      font-family:'Syne', sans-serif; font-weight:800; font-size:1.3rem; color:#fff;
-    }
-    .b-docx { background:#2b6cd4; } .b-xlsx { background:#1e8e4f; }
-    .b-pptx { background:#d4622b; } .b-txt  { background:#6b7280; }
-    .type-card strong { display:block; font-size:.95rem; }
-    .type-card small { color:var(--muted); font-size:.75rem; }
-
-    /* Panneau éditeur */
-    .panel {
-      background:var(--card-bg); border:1px solid var(--border);
-      border-radius:14px; padding:1.5rem; margin-bottom:1rem;
-    }
-    .panel h3 { font-family:'Syne', sans-serif; font-size:1.15rem; margin-bottom:1rem; }
-    .field {
-      width:100%; padding:.75rem .9rem; margin-bottom:.8rem;
-      border-radius:8px; border:1px solid var(--border);
-      background:var(--bg3); color:var(--white);
-      font-family:'Inter', sans-serif; font-size:16px;
-    }
-    .field::placeholder { color:var(--muted); }
-    textarea.field { resize:vertical; }
-    .hint { font-size:.8rem; color:var(--muted); margin-bottom:.8rem; }
-    .row { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.4rem; }
-    #status { font-size:.85rem; margin-top:.9rem; min-height:1.3em; }
-    .ok { color:#7ee89a; } .err { color:#ff9a9a; } .info { color:var(--accent2); }
-
-    .toolbar { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.7rem; }
-    .toolbar button, .mini {
-      background:var(--bg3); color:var(--white); border:1px solid var(--border);
-      border-radius:6px; padding:.45rem .75rem; font-size:.8rem; cursor:pointer;
-      font-family:'Inter', sans-serif;
-    }
-    .toolbar button:hover, .mini:hover { border-color:rgba(79,142,247,.5); }
-
-    /* Éditeur Word */
-    .wd {
-      background:#fff; color:#111; border-radius:8px; padding:1rem 1.2rem;
-      min-height:300px; max-height:60vh; overflow:auto; outline:none;
-      font-family:Calibri, Arial, sans-serif; font-size:16px; line-height:1.5;
-      margin-bottom:.8rem;
-    }
-    .wd h1 { font-size:1.8em; margin:.6em 0 .3em; }
-    .wd h2 { font-size:1.4em; margin:.6em 0 .3em; }
-    .wd h3 { font-size:1.15em; margin:.6em 0 .3em; }
-    .wd p, .wd div { margin:.2em 0; }
-    .wd ul, .wd ol { padding-left:1.7em; margin:.4em 0; }
-    .wd table { border-collapse:collapse; margin:.5em 0; }
-    .wd td, .wd th { border:1px solid #888; padding:4px 8px; min-width:50px; vertical-align:top; }
-    .wd th { background:#eee; }
-
-    /* Éditeur Excel */
-    .grid-wrap {
-      overflow:auto; max-height:55vh; border:1px solid var(--border);
-      border-radius:8px; margin-bottom:.8rem;
-    }
-    #xl { border-collapse:collapse; font-size:.85rem; }
-    #xl th {
-      background:var(--bg3); color:var(--muted); font-weight:500;
-      padding:.3rem .6rem; border:1px solid var(--border);
-      position:sticky; top:0; z-index:1; min-width:34px; text-align:center;
-    }
-    #xl td {
-      min-width:100px; padding:.4rem .5rem; border:1px solid rgba(255,255,255,.1);
-      background:rgba(255,255,255,.02); outline:none; white-space:pre-wrap;
-    }
-    #xl td:focus { background:rgba(79,142,247,.15); box-shadow:inset 0 0 0 2px var(--accent); }
-
-    /* Éditeur PowerPoint */
-    .slide-card {
-      background:var(--bg2); border:1px solid var(--border);
-      border-radius:10px; padding:1rem; margin-bottom:.8rem;
-    }
-    .slide-head { display:flex; align-items:center; gap:.6rem; margin-bottom:.7rem; flex-wrap:wrap; }
-    .slide-head strong { flex:1; font-family:'Syne', sans-serif; font-size:.9rem; }
-    .slide-head select {
-      background:var(--bg3); color:var(--white); border:1px solid var(--border);
-      border-radius:6px; padding:.4rem; font-size:.8rem;
+    @keyframes blink {
+      0%,100% { opacity:1; } 50% { opacity:.3; }
     }
 
-    /* Liste des fichiers */
-    .file-card {
-      display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
-      background:var(--card-bg); border:1px solid var(--border);
-      border-radius:14px; padding:1rem 1.2rem; margin-bottom:.7rem;
+    .reveal {
+      opacity:0; transform:translateY(24px);
+      transition:opacity .6s ease, transform .6s ease;
     }
-    .file-card .badge { width:42px; height:42px; font-size:.7rem; margin:0; flex-shrink:0; }
-    .file-info { flex:1; min-width:160px; }
-    .file-name { font-weight:500; word-break:break-word; }
-    .file-meta { font-size:.75rem; color:var(--muted); }
-    .file-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
-    .empty { color:var(--muted); font-size:.9rem; padding:1rem 0; }
+    .reveal.up { opacity:1; transform:none; }
 
-    footer {
-      border-top:1px solid var(--border); padding:2rem 0; margin-top:3rem;
-      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media(max-width:850px) {
+      #hero {
+        grid-template-columns:1fr;
+        text-align:center; padding-top:5rem;
+        gap:3rem;
+      }
+      #hero::before { display:none; }
+      .hero-bio { margin:0 auto 2.5rem; }
+      .hero-btns { justify-content:center; }
+      .hero-stats { justify-content:center; }
+      .hero-right { order:-1; }
+      .photo-frame { width:220px; height:260px; }
+      .phones-card { grid-column:span 1; }
+      .phones-grid { grid-template-columns:1fr; }
     }
-    footer p { font-size:.75rem; color:var(--muted); }
-    footer a { color:var(--accent); text-decoration:none; }
 
-    @media (max-width:700px) {
-      .page-wrap { padding:0 1.1rem; }
-      .type-grid { grid-template-columns:repeat(2, 1fr); }
-      .panel { padding:1.1rem; }
-      .file-actions { width:100%; }
-      .file-actions .btn { flex:1; }
+    @media(max-width:600px) {
+      .page-wrap { padding:0 1.2rem; }
+      .contact-grid { grid-template-columns:1fr; }
+      .phones-card { grid-column:span 1; }
       footer { flex-direction:column; text-align:center; }
     }
   </style>
 </head>
 <body>
 
+<!-- Décorations fond -->
 <div class="deco-circle deco-1"></div>
 <div class="deco-circle deco-2"></div>
 <div class="grid-lines"></div>
+<div class="cursor-glow" id="cursor-glow"></div>
+
+<!-- Overlay PDF -->
+<div id="print-overlay">
+  <div class="print-box">
+    <div class="print-box-icon">📄</div>
+    <h3>Télécharger en PDF</h3>
+    <p>
+      Une fenêtre d'impression va s'ouvrir.<br>
+      Sélectionne <strong>« Enregistrer en PDF »</strong> comme imprimante,
+      puis clique sur <strong>Enregistrer</strong>.
+    </p>
+    <div class="print-box-btns">
+      <button onclick="hidePrintOverlay()" class="btn btn-outline" style="font-size:.7rem;padding:.6rem 1.2rem;">
+        Annuler
+      </button>
+      <button onclick="confirmPrint()" class="btn btn-blue" style="font-size:.7rem;padding:.6rem 1.2rem;">
+        Continuer →
+      </button>
+    </div>
+  </div>
+</div>
 
 <div class="page-wrap">
 
-  <div class="topbar">
-    <a href="index.html" class="btn btn-outline btn-sm">← Portfolio</a>
-  </div>
+  <!-- ══════════════ HERO ══════════════ -->
+  <section id="hero">
 
-  <!-- ══════════════ CRÉER ══════════════ -->
-  <section id="create">
-    <div class="section-header">
-      <span class="section-eyebrow">Éditeur</span>
-      <h2 class="section-title">Créer un <span>document</span></h2>
+    <!-- Gauche : texte -->
+    <div class="hero-left">
+      <div class="hero-tag">
+        <span class="hero-tag-dot"></span>
+        Ingénieur · Génie Industriel
+      </div>
+
+      <h1 class="hero-name">
+        <span class="first">KOERA</span>
+        <span class="last">Alain Steven</span>
+      </h1>
+
+      <p class="hero-role">Ingénieur en Techniques Avancées de Maintenance</p>
+
+
+      <div class="hero-btns">
+        <a href="#contact" class="btn btn-blue">
+          Me contacter
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="https://maps.app.goo.gl/cDBUrv7toX8fB5DW9" target="_blank" class="btn btn-outline">
+          Localisation
+        </a>
+        <a href="documents.html" class="btn btn-outline">
+          Mes documents
+        </a>
+        <button onclick="showPrintOverlay()" class="btn btn-pdf">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3v12M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>
+          Télécharger PDF
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">TAM</div>
+          <div class="stat-lbl">Spécialité</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">IST-D</div>
+          <div class="stat-lbl">Antsiranana</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">ÉGI</div>
+          <div class="stat-lbl">École du Génie Ind.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">MG</div>
+          <div class="stat-lbl">Madagascar</div>
+        </div>
+      </div>
     </div>
 
-    <div class="type-grid" id="typeGrid">
-      <button type="button" class="type-card" data-type="docx">
-        <div class="badge b-docx">W</div><strong>Word</strong><small>.docx</small>
-      </button>
-      <button type="button" class="type-card" data-type="xlsx">
-        <div class="badge b-xlsx">X</div><strong>Excel</strong><small>.xlsx</small>
-      </button>
-      <button type="button" class="type-card" data-type="pptx">
-        <div class="badge b-pptx">P</div><strong>PowerPoint</strong><small>.pptx</small>
-      </button>
-      <button type="button" class="type-card" data-type="txt">
-        <div class="badge b-txt">T</div><strong>Texte</strong><small>.txt</small>
-      </button>
+    <!-- Droite : photo -->
+    <div class="hero-right">
+      <div class="photo-frame">
+        <div class="photo-inner">
+          <picture>
+            <source srcset="photo.jpeg" type="image/jpeg">
+            <source srcset="photo.jpg"  type="image/jpeg">
+            <source srcset="photo.png"  type="image/png">
+            <img src="photo.jpeg"
+                 alt="KOERA Alain Steven"
+                 onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'><svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\'><circle cx=\'12\' cy=\'8\' r=\'4\'/><path d=\'M4 20c0-4 3.6-7 8-7s8 3 8 7\'/></svg><p>Photo introuvable</p></div>'">
+          </picture>
+        </div>
+        <div class="available-badge">
+          <span class="available-dot"></span>
+          Stagiaire Maintenance · STAR Diego
+        </div>
+      </div>
     </div>
 
-    <div class="panel" id="editorPanel" hidden>
-      <h3 id="panelTitle"></h3>
+  </section>
 
-      <input type="text" id="docName" class="field" placeholder="Nom du fichier (ex : Rapport maintenance)" maxlength="80">
+  <!-- ══════════════ CONTACT ══════════════ -->
+  <section id="contact">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">Coordonnées</span>
+      <h2 class="section-title">Me <span>contacter</span></h2>
+    </div>
 
-      <!-- Word -->
-      <div class="ed" id="ed-docx" hidden>
-        <p class="hint">Écris ou colle ton texte (les tableaux collés sont conservés).</p>
-        <div class="toolbar" id="wdToolbar">
-          <button type="button" data-cmd="bold"><b>G</b></button>
-          <button type="button" data-cmd="italic"><i>I</i></button>
-          <button type="button" data-cmd="underline"><u>S</u></button>
-          <button type="button" data-cmd="h1">Titre 1</button>
-          <button type="button" data-cmd="h2">Titre 2</button>
-          <button type="button" data-cmd="p">Texte</button>
-          <button type="button" data-cmd="ul">• Puces</button>
-          <button type="button" data-cmd="ol">1. Numéros</button>
-          <button type="button" data-cmd="table">Tableau</button>
+    <div class="contact-grid">
+
+      <!-- Téléphones — grande carte -->
+      <div class="phones-card reveal">
+        <div class="phones-header">
+          <div class="phones-icon-wrap">📱</div>
+          <div>
+            <div class="phones-title">Téléphone · 3 lignes disponibles</div>
+          </div>
         </div>
-        <div class="wd" id="wdEditor" contenteditable="true" spellcheck="true"></div>
-      </div>
-
-      <!-- Excel -->
-      <div class="ed" id="ed-xlsx" hidden>
-        <p class="hint">Touche une cellule puis colle ton tableau : il se place automatiquement dans les cases.</p>
-        <div class="toolbar">
-          <button type="button" id="xlPaste">📋 Coller le presse-papiers</button>
-          <button type="button" id="xlAddRow">+ Ligne</button>
-          <button type="button" id="xlAddCol">+ Colonne</button>
-          <button type="button" id="xlClear">Vider</button>
+        <div class="phones-grid">
+          <a href="tel:+261325746786" class="phone-item">
+            <span class="phone-carrier carrier-orange">Orange</span>
+            <span class="phone-num">032 57 467 86</span>
+          </a>
+          <a href="tel:+261342239952" class="phone-item">
+            <span class="phone-carrier carrier-yas">Yas</span>
+            <span class="phone-num">034 22 399 52</span>
+          </a>
+          <a href="tel:+261338640293" class="phone-item">
+            <span class="phone-carrier carrier-airtel">Airtel</span>
+            <span class="phone-num">033 86 402 93</span>
+          </a>
         </div>
-        <div class="grid-wrap"><table id="xl"></table></div>
       </div>
 
-      <!-- PowerPoint -->
-      <div class="ed" id="ed-pptx" hidden>
-        <p class="hint">Chaque diapositive a un titre et du texte (une ligne = une puce).</p>
-        <div id="slides"></div>
-        <button type="button" class="btn btn-outline btn-sm" id="addSlide">+ Diapositive</button>
-        <div style="height:.9rem"></div>
-      </div>
+      <!-- Email -->
+      <a href="mailto:alainstevenkoera@gmail.com" class="contact-card card-mail reveal">
+        <div class="contact-icon-wrap">✉️</div>
+        <div class="contact-info">
+          <div class="contact-label">Email</div>
+          <div class="contact-value">alainstevenkoera@gmail.com</div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
 
-      <!-- Texte -->
-      <div class="ed" id="ed-txt" hidden>
-        <textarea id="txtEditor" class="field" rows="14" placeholder="Écris ou colle ton texte ici..."></textarea>
-      </div>
+      <!-- WhatsApp -->
+      <a href="https://wa.me/261325746786" target="_blank" rel="noopener" class="contact-card card-green reveal">
+        <div class="contact-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label">WhatsApp</div>
+          <div class="contact-value">+261 32 574 67 86</div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
 
-      <input type="password" id="pwd" class="field" placeholder="Mot de passe (pour enregistrer)" autocomplete="current-password">
+      <!-- Telegram -->
+      <a href="https://t.me/stevenalain" target="_blank" rel="noopener" class="contact-card card-sky reveal">
+        <div class="contact-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#29b6f6"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.88 13.47l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.83.95l-.002.14z"/></svg>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label">Telegram</div>
+          <div class="contact-value">@stevenalain
+            <small>+261 32 574 67 86</small>
+          </div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
 
-      <div class="row">
-        <button type="button" class="btn btn-blue" id="saveBtn">💾 Enregistrer</button>
-        <button type="button" class="btn btn-outline" id="cancelBtn">Annuler</button>
-      </div>
-      <p id="status"></p>
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/search/results/all/?keywords=KOERA+Alain+Steven" target="_blank" rel="noopener" class="contact-card card-in reveal">
+        <div class="contact-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label">LinkedIn</div>
+          <div class="contact-value">KOERA Alain Steven</div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
+
+      <!-- Facebook -->
+      <a href="https://www.facebook.com/stevenalain.vg" target="_blank" rel="noopener" class="contact-card card-fb reveal">
+        <div class="contact-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.971h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+        </div>
+        <div class="contact-info">
+          <div class="contact-label">Facebook</div>
+          <div class="contact-value">stevenalain.vg</div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
+
+      <!-- Adresse -->
+      <a href="https://maps.app.goo.gl/cDBUrv7toX8fB5DW9" target="_blank" rel="noopener" class="contact-card card-map reveal">
+        <div class="contact-icon-wrap">📍</div>
+        <div class="contact-info">
+          <div class="contact-label">Adresse</div>
+          <div class="contact-value">Antsiranana, Madagascar
+            <small>Voir sur Google Maps</small>
+          </div>
+        </div>
+        <span class="contact-arrow">→</span>
+      </a>
+
     </div>
   </section>
 
-  <!-- ══════════════ LISTE ══════════════ -->
-  <section id="files">
-    <div class="section-header">
-      <span class="section-eyebrow">Bibliothèque</span>
-      <h2 class="section-title">Mes <span>fichiers</span></h2>
-    </div>
-    <p id="listStatus" class="hint" hidden></p>
-    <div id="fileList"></div>
-  </section>
-
+  <!-- ══════════════ FOOTER ══════════════ -->
   <footer>
-    <p>© 2026 <strong>KOERA Alain Steven</strong></p>
-    <p><a href="index.html">Retour au portfolio</a></p>
+    <p>© 2026 <strong>KOERA Alain Steven</strong> · Ingénieur TAM · IST-D Antsiranana</p>
+    <p>
+      <a href="documents.html">Mes documents</a> ·
+      <a href="mailto:alainstevenkoera@gmail.com">alainstevenkoera@gmail.com</a>
+    </p>
   </footer>
-</div>
+
+</div><!-- /page-wrap -->
 
 <script>
-  const $ = (id) => document.getElementById(id);
-  const NAMES = { docx: 'Word', xlsx: 'Excel', pptx: 'PowerPoint', txt: 'Texte' };
-  const MAX_BYTES = 4 * 1024 * 1024;
-  let currentType = null;
-  let saving = false;
+  // Cursor glow
+  const glow = document.getElementById('cursor-glow');
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top  = e.clientY + 'px';
+  });
 
-  function setStatus(msg, cls) {
-    const s = $('status');
-    s.textContent = msg || '';
-    s.className = cls || '';
-  }
-
-  /* ───────────── Chargement des outils de création (à la demande) ───────────── */
-  const LIBS = {
-    docx: ['https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js',
-           'https://unpkg.com/docx@8.5.0/build/index.umd.js'],
-    xlsx: ['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-           'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'],
-    pptx: ['https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js',
-           'https://unpkg.com/pptxgenjs@3.12.0/dist/pptxgen.bundle.js'],
-  };
-  const GLOBALS = { docx: 'docx', xlsx: 'XLSX', pptx: 'PptxGenJS' };
-  const libPromises = {};
-
-  function loadScript(url) {
-    return new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = url;
-      s.onload = resolve;
-      s.onerror = () => { s.remove(); reject(new Error('échec ' + url)); };
-      document.head.appendChild(s);
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('up'); io.unobserve(e.target); }
     });
-  }
+  }, { threshold: 0.1 });
+  reveals.forEach(el => io.observe(el));
 
-  function loadLib(type) {
-    if (!LIBS[type] || window[GLOBALS[type]]) return Promise.resolve();
-    if (!libPromises[type]) {
-      libPromises[type] = (async () => {
-        for (const url of LIBS[type]) {
-          try { await loadScript(url); if (window[GLOBALS[type]]) return; } catch (e) {}
-        }
-        throw new Error("Impossible de charger l'outil de création " + NAMES[type] + ". Vérifie ta connexion.");
-      })().catch((e) => { delete libPromises[type]; throw e; });
-    }
-    return libPromises[type];
+  // PDF / Print
+  function showPrintOverlay() {
+    document.getElementById('print-overlay').classList.add('show');
+    document.body.style.overflow = 'hidden';
   }
-
-  /* ───────────── Choix du type ───────────── */
-  document.querySelectorAll('.type-card').forEach((card) => {
-    card.addEventListener('click', () => openEditor(card.dataset.type));
+  function hidePrintOverlay() {
+    document.getElementById('print-overlay').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  function confirmPrint() {
+    hidePrintOverlay();
+    // Petit délai pour que l'overlay disparaisse proprement
+    setTimeout(() => {
+      document.title = 'KOERA_Alain_Steven_Portfolio';
+      window.print();
+    }, 300);
+  }
+  // Fermer avec Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') hidePrintOverlay();
   });
-
-  function openEditor(type) {
-    currentType = type;
-    document.querySelectorAll('.type-card').forEach((c) => c.classList.toggle('active', c.dataset.type === type));
-    document.querySelectorAll('.ed').forEach((d) => { d.hidden = d.id !== 'ed-' + type; });
-    $('panelTitle').textContent = 'Nouveau document ' + NAMES[type];
-    $('docName').value = '';
-    $('pwd').value = localStorage.getItem('doc_pwd') || '';
-    setStatus('');
-
-    if (type === 'docx') $('wdEditor').innerHTML = '';
-    if (type === 'xlsx') initGrid(15, 6);
-    if (type === 'pptx') { $('slides').innerHTML = ''; addSlide('cover'); }
-    if (type === 'txt') $('txtEditor').value = '';
-
-    $('editorPanel').hidden = false;
-    $('editorPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    loadLib(type).catch(() => {}); // préchargement discret
-  }
-
-  $('cancelBtn').addEventListener('click', () => {
-    $('editorPanel').hidden = true;
-    currentType = null;
-    document.querySelectorAll('.type-card').forEach((c) => c.classList.remove('active'));
+  // Fermer en cliquant hors de la box
+  document.getElementById('print-overlay').addEventListener('click', function(e) {
+    if (e.target === this) hidePrintOverlay();
   });
-
-  /* ═══════════════════════ WORD ═══════════════════════ */
-  try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (e) {}
-
-  document.querySelectorAll('#wdToolbar button').forEach((b) => {
-    b.addEventListener('mousedown', (e) => e.preventDefault());
-    b.addEventListener('click', () => {
-      const cmd = b.dataset.cmd;
-      $('wdEditor').focus();
-      if (cmd === 'h1' || cmd === 'h2' || cmd === 'p') document.execCommand('formatBlock', false, '<' + cmd + '>');
-      else if (cmd === 'ul') document.execCommand('insertUnorderedList');
-      else if (cmd === 'ol') document.execCommand('insertOrderedList');
-      else if (cmd === 'table') {
-        const row = '<tr><td><br></td><td><br></td><td><br></td></tr>';
-        document.execCommand('insertHTML', false, '<table><tbody>' + row + row + row + '</tbody></table><p><br></p>');
-      } else document.execCommand(cmd);
-    });
-  });
-
-  // Nettoie le HTML collé (Word, Google Docs, pages web...) : garde titres, listes, gras, tableaux
-  function sanitize(html) {
-    const src = new DOMParser().parseFromString(html, 'text/html').body;
-    const KEEP = { H1:'h1', H2:'h2', H3:'h3', H4:'h3', H5:'h3', H6:'h3', P:'p', DIV:'div', BR:'br',
-      UL:'ul', OL:'ol', LI:'li', B:'b', STRONG:'b', I:'i', EM:'i', U:'u',
-      TABLE:'table', THEAD:'thead', TBODY:'tbody', TFOOT:'tfoot', TR:'tr', TD:'td', TH:'th' };
-    const DROP = new Set(['SCRIPT','STYLE','META','LINK','TITLE','HEAD','IMG','SVG','IFRAME','OBJECT','NOSCRIPT']);
-    const out = document.createElement('div');
-
-    function walk(node, target) {
-      node.childNodes.forEach((n) => {
-        if (n.nodeType === 3) { target.appendChild(document.createTextNode(n.textContent)); return; }
-        if (n.nodeType !== 1) return;
-        const tag = n.tagName.toUpperCase();
-        if (DROP.has(tag)) return;
-
-        const st = n.style || {};
-        const fw = st.fontWeight || '';
-        const bold = fw === 'bold' || fw === 'bolder' || parseInt(fw, 10) >= 600;
-        const italic = st.fontStyle === 'italic';
-        const under = /underline/.test(st.textDecoration || st.textDecorationLine || '');
-
-        if (KEEP[tag]) {
-          // Google Docs enveloppe tout dans un <b style="font-weight:normal"> : on l'ignore
-          if (KEEP[tag] === 'b' && (fw === 'normal' || fw === '400')) { walk(n, target); return; }
-          const el = document.createElement(KEEP[tag]);
-          target.appendChild(el);
-          walk(n, el);
-          return;
-        }
-        // Balise inconnue (span, font, a...) : on garde le contenu et la mise en forme
-        let dest = target;
-        [bold && 'b', italic && 'i', under && 'u'].filter(Boolean).forEach((w) => {
-          const el = document.createElement(w);
-          dest.appendChild(el);
-          dest = el;
-        });
-        walk(n, dest);
-      });
-    }
-    walk(src, out);
-    return out.innerHTML;
-  }
-
-  $('wdEditor').addEventListener('paste', (e) => {
-    const cd = e.clipboardData;
-    if (!cd) return;
-    e.preventDefault();
-    const html = cd.getData('text/html');
-    const text = cd.getData('text/plain');
-    if (html) {
-      const clean = sanitize(html);
-      if (clean.trim()) { document.execCommand('insertHTML', false, clean); return; }
-    }
-    document.execCommand('insertText', false, text);
-  });
-
-  // Convertit le contenu de l'éditeur en vrai fichier .docx
-  async function buildDocx() {
-    const root = $('wdEditor');
-    if (!root.innerText.trim() && !root.querySelector('table')) throw new Error('Le document est vide.');
-    await loadLib('docx');
-    const D = window.docx;
-
-    const numbering = [];
-    let listN = 0;
-    const BLOCK = new Set(['H1', 'H2', 'H3', 'P', 'DIV', 'UL', 'OL', 'TABLE']);
-    const HEAD = { H1: D.HeadingLevel.HEADING_1, H2: D.HeadingLevel.HEADING_2, H3: D.HeadingLevel.HEADING_3 };
-
-    function runs(nodes, fmt) {
-      const out = [];
-      nodes.forEach((n) => {
-        if (n.nodeType === 3) {
-          const t = n.textContent.replace(/\u00a0/g, ' ').replace(/[\r\n]+/g, ' ');
-          if (t) out.push(new D.TextRun({
-            text: t,
-            bold: fmt.b || undefined,
-            italics: fmt.i || undefined,
-            underline: fmt.u ? { type: D.UnderlineType.SINGLE } : undefined,
-          }));
-        } else if (n.nodeType === 1) {
-          const tag = n.tagName;
-          if (tag === 'BR') { out.push(new D.TextRun({ break: 1 })); return; }
-          const f = Object.assign({}, fmt);
-          if (tag === 'B' || tag === 'STRONG') f.b = true;
-          if (tag === 'I' || tag === 'EM') f.i = true;
-          if (tag === 'U') f.u = true;
-          out.push(...runs(Array.from(n.childNodes), f));
-        }
-      });
-      return out;
-    }
-
-    function para(nodes, fmt, opts) {
-      const onlyBr = nodes.length === 1 && nodes[0].nodeType === 1 && nodes[0].tagName === 'BR';
-      const children = onlyBr ? [] : runs(nodes, fmt);
-      return new D.Paragraph(Object.assign({ children }, opts || {}));
-    }
-
-    function newRef() {
-      const ref = 'num' + (++listN);
-      numbering.push({
-        reference: ref,
-        levels: [0, 1, 2, 3, 4].map((l) => ({
-          level: l, format: D.LevelFormat.DECIMAL, text: '%' + (l + 1) + '.',
-          alignment: D.AlignmentType.START,
-          style: { paragraph: { indent: { left: 720 * (l + 1), hanging: 360 } } },
-        })),
-      });
-      return ref;
-    }
-
-    function list(el, fmt, lvl, ref) {
-      const out = [];
-      Array.from(el.children).forEach((li) => {
-        if (li.tagName !== 'LI') return;
-        const inline = [], nested = [];
-        Array.from(li.childNodes).forEach((c) => {
-          if (c.nodeType === 1 && (c.tagName === 'UL' || c.tagName === 'OL')) nested.push(c);
-          else inline.push(c);
-        });
-        const l = Math.min(lvl, 4);
-        out.push(para(inline, fmt, ref ? { numbering: { reference: ref, level: l } } : { bullet: { level: l } }));
-        nested.forEach((nl) => out.push(...list(nl, fmt, lvl + 1, nl.tagName === 'OL' ? newRef() : null)));
-      });
-      return out;
-    }
-
-    function table(t, fmt) {
-      const rows = Array.from(t.rows);
-      if (!rows.length) return para([], fmt);
-      let cols = 1;
-      rows.forEach((r) => {
-        let c = 0;
-        Array.from(r.cells).forEach((x) => { c += x.colSpan || 1; });
-        cols = Math.max(cols, c);
-      });
-      const w = Math.floor(9000 / cols);
-      return new D.Table({
-        width: { size: w * cols, type: D.WidthType.DXA },
-        columnWidths: Array(cols).fill(w),
-        rows: rows.map((r) => new D.TableRow({
-          children: Array.from(r.cells).map((c) => {
-            const f = Object.assign({}, fmt);
-            if (c.tagName === 'TH') f.b = true;
-            let kids = blocks(c, f);
-            if (!kids.length) kids = [new D.Paragraph({})];
-            const span = c.colSpan || 1;
-            return new D.TableCell({
-              width: { size: w * span, type: D.WidthType.DXA },
-              columnSpan: span > 1 ? span : undefined,
-              children: kids,
-            });
-          }),
-        })),
-      });
-    }
-
-    function blocks(container, fmt) {
-      const out = [];
-      let pending = [];
-      const flush = () => {
-        if (pending.some((n) => !(n.nodeType === 3 && !n.textContent.trim()))) out.push(para(pending, fmt));
-        pending = [];
-      };
-      Array.from(container.childNodes).forEach((n) => {
-        if (n.nodeType === 1 && BLOCK.has(n.tagName)) {
-          flush();
-          const tag = n.tagName;
-          if (HEAD[tag]) out.push(para(Array.from(n.childNodes), fmt, { heading: HEAD[tag] }));
-          else if (tag === 'P') out.push(para(Array.from(n.childNodes), fmt));
-          else if (tag === 'DIV') {
-            if (Array.from(n.children).some((c) => BLOCK.has(c.tagName))) out.push(...blocks(n, fmt));
-            else out.push(para(Array.from(n.childNodes), fmt));
-          }
-          else if (tag === 'UL') out.push(...list(n, fmt, 0, null));
-          else if (tag === 'OL') out.push(...list(n, fmt, 0, newRef()));
-          else if (tag === 'TABLE') out.push(table(n, fmt));
-        } else pending.push(n);
-      });
-      flush();
-      return out;
-    }
-
-    let children = blocks(root, {});
-    if (!children.length) children = [new D.Paragraph({})];
-    if (children[children.length - 1] instanceof D.Table) children.push(new D.Paragraph({}));
-
-    const cfg = {
-      styles: { default: { document: { run: { font: 'Calibri', size: 24 } } } },
-      sections: [{ children }],
-    };
-    if (numbering.length) cfg.numbering = { config: numbering };
-    return await D.Packer.toBlob(new D.Document(cfg));
-  }
-
-  /* ═══════════════════════ EXCEL ═══════════════════════ */
-  const xl = $('xl');
-  let XR = 0, XC = 0, lastTd = null;
-
-  function colName(i) {
-    let s = '';
-    i++;
-    while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); }
-    return s;
-  }
-
-  function mkCell(r, c) {
-    const td = document.createElement('td');
-    td.contentEditable = 'true';
-    td.dataset.r = r;
-    td.dataset.c = c;
-    return td;
-  }
-
-  function cellAt(r, c) { return xl.tBodies[0].rows[r].cells[c + 1]; }
-
-  function ensureSize(r, c) {
-    const hr = xl.tHead.rows[0];
-    const body = xl.tBodies[0];
-    while (XC < c) {
-      const th = document.createElement('th');
-      th.textContent = colName(XC);
-      hr.appendChild(th);
-      Array.from(body.rows).forEach((row, ri) => row.appendChild(mkCell(ri, XC)));
-      XC++;
-    }
-    while (XR < r) {
-      const row = body.insertRow();
-      const th = document.createElement('th');
-      th.textContent = XR + 1;
-      row.appendChild(th);
-      for (let ci = 0; ci < XC; ci++) row.appendChild(mkCell(XR, ci));
-      XR++;
-    }
-  }
-
-  function initGrid(r, c) {
-    xl.innerHTML = '';
-    XR = 0; XC = 0; lastTd = null;
-    xl.createTHead().insertRow().appendChild(document.createElement('th'));
-    xl.appendChild(document.createElement('tbody'));
-    ensureSize(r, c);
-  }
-
-  // Lit du texte venant d'Excel / Google Sheets (colonnes séparées par des tabulations)
-  function parseTSV(t) {
-    t = t.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    if (t.endsWith('\n')) t = t.slice(0, -1);
-    const rows = [];
-    let row = [], cell = '', q = false;
-    for (let i = 0; i < t.length; i++) {
-      const c = t[i];
-      if (q) {
-        if (c === '"') { if (t[i + 1] === '"') { cell += '"'; i++; } else q = false; }
-        else cell += c;
-      } else if (c === '"' && cell === '') q = true;
-      else if (c === '\t') { row.push(cell); cell = ''; }
-      else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
-      else cell += c;
-    }
-    row.push(cell);
-    rows.push(row);
-    return rows;
-  }
-
-  function fillGrid(rows, startTd) {
-    const r0 = startTd ? +startTd.dataset.r : 0;
-    const c0 = startTd ? +startTd.dataset.c : 0;
-    const maxC = Math.max(...rows.map((r) => r.length));
-    ensureSize(Math.max(XR, r0 + rows.length), Math.max(XC, c0 + maxC));
-    rows.forEach((row, i) => row.forEach((v, j) => { cellAt(r0 + i, c0 + j).textContent = v; }));
-  }
-
-  xl.addEventListener('focusin', (e) => { if (e.target.tagName === 'TD') lastTd = e.target; });
-
-  xl.addEventListener('paste', (e) => {
-    const td = e.target.closest ? e.target.closest('td') : null;
-    if (!td) return;
-    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-    e.preventDefault();
-    if (!/[\t\n\r]/.test(text.replace(/[\r\n]+$/, ''))) {
-      document.execCommand('insertText', false, text.replace(/[\r\n]+$/, ''));
-      return;
-    }
-    fillGrid(parseTSV(text), td);
-  });
-
-  $('xlPaste').addEventListener('click', async () => {
-    try {
-      const t = await navigator.clipboard.readText();
-      if (!t) return;
-      fillGrid(parseTSV(t), lastTd);
-      setStatus('');
-    } catch (e) {
-      setStatus('Lecture du presse-papiers impossible : appuie longuement sur une cellule, puis « Coller ».', 'err');
-    }
-  });
-  $('xlAddRow').addEventListener('click', () => ensureSize(XR + 1, XC));
-  $('xlAddCol').addEventListener('click', () => ensureSize(XR, XC + 1));
-  $('xlClear').addEventListener('click', () => { if (confirm('Vider tout le tableau ?')) initGrid(15, 6); });
-
-  function toValue(v) {
-    if (/^-?\d+([.,]\d+)?$/.test(v) && !/^-?0\d/.test(v) && v.replace(/\D/g, '').length <= 15) {
-      return Number(v.replace(',', '.'));
-    }
-    return v;
-  }
-
-  async function buildXlsx() {
-    const data = [];
-    for (let r = 0; r < XR; r++) {
-      const row = [];
-      for (let c = 0; c < XC; c++) row.push(cellAt(r, c).innerText.replace(/\n$/, '').trim());
-      data.push(row);
-    }
-    while (data.length && data[data.length - 1].every((v) => v === '')) data.pop();
-    if (!data.length) throw new Error('Le tableau est vide.');
-    let maxCol = 0;
-    data.forEach((row) => row.forEach((v, c) => { if (v !== '') maxCol = Math.max(maxCol, c + 1); }));
-    const rows = data.map((row) => row.slice(0, maxCol).map(toValue));
-
-    await loadLib('xlsx');
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = Array.from({ length: maxCol }, (_, c) => {
-      const len = Math.max(...rows.map((r) => String(r[c] === undefined ? '' : r[c]).length));
-      return { wch: Math.min(60, Math.max(8, len + 2)) };
-    });
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Feuille1');
-    const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  }
-
-  /* ═══════════════════════ POWERPOINT ═══════════════════════ */
-  function renumberSlides() {
-    Array.from($('slides').children).forEach((card, i) => {
-      card.querySelector('.slide-num').textContent = 'Diapositive ' + (i + 1);
-    });
-  }
-
-  function updatePlaceholder(card) {
-    const cover = card.querySelector('.sl-layout').value === 'cover';
-    card.querySelector('.sl-body').placeholder = cover ? 'Sous-titre (facultatif)' : 'Une ligne = une puce';
-  }
-
-  function addSlide(layout) {
-    const card = document.createElement('div');
-    card.className = 'slide-card';
-    card.innerHTML =
-      '<div class="slide-head"><strong class="slide-num"></strong>' +
-      '<select class="sl-layout"><option value="content">Titre + puces</option><option value="cover">Page de titre</option></select>' +
-      '<button type="button" class="mini sl-del">Retirer</button></div>' +
-      '<input type="text" class="field sl-title" placeholder="Titre de la diapositive">' +
-      '<textarea class="field sl-body" rows="5"></textarea>';
-    card.querySelector('.sl-layout').value = layout || 'content';
-    card.querySelector('.sl-layout').addEventListener('change', () => updatePlaceholder(card));
-    card.querySelector('.sl-del').addEventListener('click', () => {
-      card.remove();
-      if (!$('slides').children.length) addSlide('content');
-      renumberSlides();
-    });
-    $('slides').appendChild(card);
-    updatePlaceholder(card);
-    renumberSlides();
-  }
-  $('addSlide').addEventListener('click', () => addSlide('content'));
-
-  async function buildPptx() {
-    const slides = Array.from($('slides').children).map((card) => ({
-      layout: card.querySelector('.sl-layout').value,
-      title: card.querySelector('.sl-title').value.trim(),
-      body: card.querySelector('.sl-body').value,
-    })).filter((s) => s.title || s.body.trim());
-    if (!slides.length) throw new Error('Ajoute au moins une diapositive avec du contenu.');
-
-    await loadLib('pptx');
-    const pptx = new PptxGenJS();
-    pptx.layout = 'LAYOUT_16x9';
-
-    slides.forEach((sl) => {
-      const s = pptx.addSlide();
-      if (sl.layout === 'cover') {
-        s.background = { color: '0B0E13' };
-        s.addText(sl.title, { x: 0.7, y: 1.5, w: 8.6, h: 1.5, fontSize: 40, bold: true, color: 'F0F4FF', fontFace: 'Calibri', valign: 'middle', fit: 'shrink' });
-        s.addShape(pptx.ShapeType.rect, { x: 0.7, y: 3.1, w: 1.2, h: 0.06, fill: { color: '4F8EF7' }, line: { color: '4F8EF7' } });
-        if (sl.body.trim()) s.addText(sl.body.trim(), { x: 0.7, y: 3.35, w: 8.6, h: 1.3, fontSize: 20, color: 'AEB8D0', fontFace: 'Calibri', valign: 'top', fit: 'shrink' });
-      } else {
-        s.background = { color: 'FFFFFF' };
-        s.addText(sl.title, { x: 0.6, y: 0.35, w: 8.8, h: 0.9, fontSize: 30, bold: true, color: '111827', fontFace: 'Calibri', valign: 'middle', fit: 'shrink' });
-        s.addShape(pptx.ShapeType.rect, { x: 0.6, y: 1.25, w: 1.0, h: 0.05, fill: { color: '4F8EF7' }, line: { color: '4F8EF7' } });
-        const lines = sl.body.split('\n').map((l) => l.trim()).filter(Boolean);
-        if (lines.length) {
-          s.addText(
-            lines.map((l) => ({ text: l, options: { bullet: true, breakLine: true } })),
-            { x: 0.6, y: 1.5, w: 8.8, h: 3.7, fontSize: 20, color: '1F2937', fontFace: 'Calibri', valign: 'top', paraSpaceAfter: 8, fit: 'shrink' }
-          );
-        }
-      }
-    });
-
-    let out;
-    try { out = await pptx.write({ outputType: 'arraybuffer' }); }
-    catch (e) { out = await pptx.write('arraybuffer'); }
-    return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
-  }
-
-  /* ═══════════════════════ TEXTE ═══════════════════════ */
-  async function buildTxt() {
-    const text = $('txtEditor').value;
-    if (!text.trim()) throw new Error('Le texte est vide.');
-    return new Blob([text], { type: 'text/plain;charset=utf-8' });
-  }
-
-  /* ═══════════════════════ ENREGISTRER ═══════════════════════ */
-  $('saveBtn').addEventListener('click', async () => {
-    if (saving || !currentType) return;
-    const btn = $('saveBtn');
-    const type = currentType;
-
-    const base = $('docName').value.trim().replace(/\.(docx|xlsx|pptx|txt)$/i, '').trim();
-    const pwd = $('pwd').value;
-    if (!base) { setStatus('Donne un nom au fichier.', 'err'); return; }
-    if (!pwd) { setStatus('Entre le mot de passe pour enregistrer.', 'err'); return; }
-
-    saving = true;
-    btn.disabled = true;
-    setStatus('Création du fichier...', 'info');
-
-    try {
-      let blob;
-      if (type === 'docx') blob = await buildDocx();
-      else if (type === 'xlsx') blob = await buildXlsx();
-      else if (type === 'pptx') blob = await buildPptx();
-      else blob = await buildTxt();
-
-      if (blob.size > MAX_BYTES) throw new Error('Fichier trop gros (4 Mo maximum).');
-
-      setStatus('Enregistrement...', 'info');
-      const res = await fetch('/api/files', {
-        method: 'POST',
-        headers: {
-          'x-admin-password': pwd,
-          'x-filename': encodeURIComponent(base + '.' + type),
-          'Content-Type': 'application/octet-stream',
-        },
-        body: blob,
-      });
-
-      if (res.status === 401) {
-        localStorage.removeItem('doc_pwd');
-        throw new Error('Mot de passe incorrect.');
-      }
-      if (!res.ok) {
-        let msg = "Erreur lors de l'enregistrement.";
-        try { msg = (await res.json()).error || msg; } catch (e) {}
-        throw new Error(msg);
-      }
-
-      localStorage.setItem('doc_pwd', pwd);
-      setStatus('✅ Fichier enregistré : ' + base + '.' + type, 'ok');
-      await loadFiles();
-      $('files').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (err) {
-      setStatus('❌ ' + err.message, 'err');
-    } finally {
-      saving = false;
-      btn.disabled = false;
-    }
-  });
-
-  /* ═══════════════════════ LISTE DES FICHIERS ═══════════════════════ */
-  function fmtSize(n) {
-    if (n < 1024) return n + ' o';
-    if (n < 1024 * 1024) return Math.round(n / 1024) + ' Ko';
-    return (n / 1024 / 1024).toFixed(1) + ' Mo';
-  }
-
-  async function loadFiles() {
-    const list = $('fileList');
-    const st = $('listStatus');
-    try {
-      const res = await fetch('/api/files', { cache: 'no-store' });
-      if (!res.ok) throw new Error();
-      const { files } = await res.json();
-      st.hidden = true;
-      list.innerHTML = '';
-      if (!files.length) {
-        const p = document.createElement('p');
-        p.className = 'empty';
-        p.textContent = "Aucun fichier pour l'instant. Crée ton premier document ci-dessus.";
-        list.appendChild(p);
-        return;
-      }
-      files.forEach((f) => list.appendChild(renderFile(f)));
-    } catch (e) {
-      st.textContent = 'Impossible de charger la liste des fichiers.';
-      st.hidden = false;
-    }
-  }
-
-  function renderFile(f) {
-    const card = document.createElement('div');
-    card.className = 'file-card';
-
-    const badge = document.createElement('div');
-    badge.className = 'badge b-' + (NAMES[f.ext] ? f.ext : 'txt');
-    badge.textContent = f.ext.toUpperCase();
-
-    const info = document.createElement('div');
-    info.className = 'file-info';
-    const name = document.createElement('div');
-    name.className = 'file-name';
-    name.textContent = f.name.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-    const meta = document.createElement('div');
-    meta.className = 'file-meta';
-    meta.textContent = fmtSize(f.size) + ' · ' + new Date(f.date).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
-    info.append(name, meta);
-
-    const actions = document.createElement('div');
-    actions.className = 'file-actions';
-    const dl = document.createElement('a');
-    dl.className = 'btn btn-blue btn-sm';
-    dl.textContent = 'Télécharger';
-    dl.href = f.downloadUrl;
-    dl.setAttribute('download', f.name);
-    const del = document.createElement('button');
-    del.type = 'button';
-    del.className = 'btn btn-danger btn-sm';
-    del.textContent = 'Supprimer';
-    del.addEventListener('click', () => removeFile(f));
-    actions.append(dl, del);
-
-    card.append(badge, info, actions);
-    return card;
-  }
-
-  async function removeFile(f) {
-    if (!confirm('Supprimer « ' + f.name + ' » définitivement ?')) return;
-    let pwd = localStorage.getItem('doc_pwd') || '';
-    if (!pwd) {
-      pwd = prompt('Mot de passe :') || '';
-      if (!pwd) return;
-    }
-    try {
-      const res = await fetch('/api/files?path=' + encodeURIComponent(f.pathname), {
-        method: 'DELETE',
-        headers: { 'x-admin-password': pwd },
-      });
-      if (res.status === 401) {
-        localStorage.removeItem('doc_pwd');
-        alert('Mot de passe incorrect.');
-        return;
-      }
-      if (!res.ok) { alert('Erreur lors de la suppression.'); return; }
-      localStorage.setItem('doc_pwd', pwd);
-      loadFiles();
-    } catch (e) {
-      alert('Erreur réseau.');
-    }
-  }
-
-  loadFiles();
 </script>
 </body>
 </html>
