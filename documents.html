@@ -179,6 +179,23 @@
     .file-actions { display:flex; gap:.5rem; flex-wrap:wrap; }
     .empty { color:var(--muted); font-size:.9rem; padding:1rem 0; }
 
+    .lock-box { max-width:420px; }
+    .lock-box .field { margin-bottom:.7rem; }
+    .list-tools { display:flex; justify-content:flex-end; margin-bottom:.8rem; }
+    .pub-note { font-size:.75rem; color:var(--gold); margin-top:.15rem; }
+    .btn-gold { background:transparent; color:var(--gold); border:1px solid rgba(226,185,106,.35); }
+    .btn-gold:hover { background:rgba(226,185,106,.08); border-color:var(--gold); }
+    .modal {
+      position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.7);
+      display:flex; align-items:center; justify-content:center; padding:1.2rem;
+    }
+    .modal-box {
+      background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+      padding:1.5rem; width:100%; max-width:380px;
+    }
+    .modal-box h3 { font-family:'Syne', sans-serif; font-size:1.1rem; margin-bottom:.5rem; }
+    .modal-box select.field { appearance:auto; }
+
     footer {
       border-top:1px solid var(--border); padding:2rem 0; margin-top:3rem;
       display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
@@ -277,8 +294,6 @@
         <textarea id="txtEditor" class="field" rows="14" placeholder="Écris ou colle ton texte ici..."></textarea>
       </div>
 
-      <input type="password" id="pwd" class="field" placeholder="Mot de passe (pour enregistrer)" autocomplete="current-password">
-
       <div class="row">
         <button type="button" class="btn btn-blue" id="saveBtn">💾 Enregistrer</button>
         <button type="button" class="btn btn-outline" id="cancelBtn">Annuler</button>
@@ -294,8 +309,44 @@
       <h2 class="section-title">Mes <span>fichiers</span></h2>
     </div>
     <p id="listStatus" class="hint" hidden></p>
+
+    <div class="panel lock-box" id="lockBox" hidden>
+      <h3>🔒 Liste protégée</h3>
+      <p class="hint">Entre le mot de passe pour voir, mettre à l'accueil ou supprimer tes fichiers.</p>
+      <input type="password" id="unlockPwd" class="field" placeholder="Mot de passe" autocomplete="current-password">
+      <button type="button" class="btn btn-blue" id="unlockBtn">Voir mes fichiers</button>
+      <p id="lockMsg" class="err" style="margin-top:.7rem;font-size:.85rem"></p>
+    </div>
+
+    <div class="list-tools" id="listTools" hidden>
+      <button type="button" class="btn btn-outline btn-sm" id="lockNow">🔒 Verrouiller</button>
+    </div>
     <div id="fileList"></div>
   </section>
+
+  <!-- Fenêtre : durée sur l'accueil -->
+  <div class="modal" id="pubModal" hidden>
+    <div class="modal-box">
+      <h3>Mettre à l'accueil</h3>
+      <p class="hint" id="pubFile"></p>
+      <p class="hint">Pendant combien de temps ce fichier sera-t-il disponible sur l'accueil ?</p>
+      <select id="pubDur" class="field">
+        <option value="1">1 heure</option>
+        <option value="24" selected>1 jour</option>
+        <option value="168">7 jours</option>
+        <option value="720">30 jours</option>
+        <option value="custom">Autre durée…</option>
+      </select>
+      <div id="pubCustomRow" hidden>
+        <input type="number" id="pubCustom" class="field" min="1" max="365" step="1" placeholder="Nombre de jours (1 à 365)">
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-blue" id="pubOk">Publier</button>
+        <button type="button" class="btn btn-outline" id="pubCancel">Annuler</button>
+      </div>
+      <p id="pubStatus" style="margin-top:.8rem;font-size:.85rem;min-height:1.2em"></p>
+    </div>
+  </div>
 
   <footer>
     <p>© 2026 <strong>KOERA Alain Steven</strong></p>
@@ -362,7 +413,6 @@
     document.querySelectorAll('.ed').forEach((d) => { d.hidden = d.id !== 'ed-' + type; });
     $('panelTitle').textContent = 'Nouveau document ' + NAMES[type];
     $('docName').value = '';
-    $('pwd').value = localStorage.getItem('doc_pwd') || '';
     setStatus('');
 
     if (type === 'docx') $('wdEditor').innerHTML = '';
@@ -820,9 +870,7 @@
     const type = currentType;
 
     const base = $('docName').value.trim().replace(/\.(docx|xlsx|pptx|txt)$/i, '').trim();
-    const pwd = $('pwd').value;
     if (!base) { setStatus('Donne un nom au fichier.', 'err'); return; }
-    if (!pwd) { setStatus('Entre le mot de passe pour enregistrer.', 'err'); return; }
 
     saving = true;
     btn.disabled = true;
@@ -841,27 +889,21 @@
       const res = await fetch('/api/files', {
         method: 'POST',
         headers: {
-          'x-admin-password': pwd,
           'x-filename': encodeURIComponent(base + '.' + type),
           'Content-Type': 'application/octet-stream',
         },
         body: blob,
       });
 
-      if (res.status === 401) {
-        localStorage.removeItem('doc_pwd');
-        throw new Error('Mot de passe incorrect.');
-      }
       if (!res.ok) {
         let msg = "Erreur lors de l'enregistrement.";
         try { msg = (await res.json()).error || msg; } catch (e) {}
         throw new Error(msg);
       }
 
-      localStorage.setItem('doc_pwd', pwd);
       setStatus('✅ Fichier enregistré : ' + base + '.' + type, 'ok');
       await loadFiles();
-      $('files').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (getPwd()) $('files').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
       setStatus('❌ ' + err.message, 'err');
     } finally {
@@ -870,26 +912,47 @@
     }
   });
 
-  /* ═══════════════════════ LISTE DES FICHIERS ═══════════════════════ */
+  /* ═══════════════════════ LISTE DES FICHIERS (protégée) ═══════════════════════ */
+  const PWD_KEY = 'doc_pwd';
+  const getPwd = () => localStorage.getItem(PWD_KEY) || '';
+
   function fmtSize(n) {
     if (n < 1024) return n + ' o';
     if (n < 1024 * 1024) return Math.round(n / 1024) + ' Ko';
     return (n / 1024 / 1024).toFixed(1) + ' Mo';
   }
+  const fmtDate = (d) => new Date(d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+
+  function showLocked(msg) {
+    $('lockBox').hidden = false;
+    $('listTools').hidden = true;
+    $('listStatus').hidden = true;
+    $('fileList').innerHTML = '';
+    $('lockMsg').textContent = msg || '';
+  }
 
   async function loadFiles() {
     const list = $('fileList');
     const st = $('listStatus');
+    const pwd = getPwd();
+    if (!pwd) { showLocked(''); return; }
     try {
-      const res = await fetch('/api/files', { cache: 'no-store' });
+      const res = await fetch('/api/files', { cache: 'no-store', headers: { 'x-admin-password': pwd } });
+      if (res.status === 401) {
+        localStorage.removeItem(PWD_KEY);
+        showLocked('Mot de passe incorrect.');
+        return;
+      }
       if (!res.ok) throw new Error();
       const { files } = await res.json();
+      $('lockBox').hidden = true;
+      $('listTools').hidden = false;
       st.hidden = true;
       list.innerHTML = '';
       if (!files.length) {
         const p = document.createElement('p');
         p.className = 'empty';
-        p.textContent = "Aucun fichier pour l'instant. Crée ton premier document ci-dessus.";
+        p.textContent = "Aucun fichier pour l'instant. Crée un document ci-dessus ou attends un envoi depuis l'accueil.";
         list.appendChild(p);
         return;
       }
@@ -900,13 +963,23 @@
     }
   }
 
+  $('unlockBtn').addEventListener('click', () => {
+    const v = $('unlockPwd').value;
+    if (!v) { $('lockMsg').textContent = 'Entre le mot de passe.'; return; }
+    localStorage.setItem(PWD_KEY, v);
+    $('unlockPwd').value = '';
+    loadFiles();
+  });
+  $('unlockPwd').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('unlockBtn').click(); });
+  $('lockNow').addEventListener('click', () => { localStorage.removeItem(PWD_KEY); showLocked(''); });
+
   function renderFile(f) {
     const card = document.createElement('div');
     card.className = 'file-card';
 
     const badge = document.createElement('div');
     badge.className = 'badge b-' + (NAMES[f.ext] ? f.ext : 'txt');
-    badge.textContent = f.ext.toUpperCase();
+    badge.textContent = (f.ext || 'fich').slice(0, 4).toUpperCase();
 
     const info = document.createElement('div');
     info.className = 'file-info';
@@ -915,51 +988,135 @@
     name.textContent = f.name.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
     const meta = document.createElement('div');
     meta.className = 'file-meta';
-    meta.textContent = fmtSize(f.size) + ' · ' + new Date(f.date).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+    meta.textContent = fmtSize(f.size) + ' · ' + fmtDate(f.date);
     info.append(name, meta);
+    if (f.published) {
+      const note = document.createElement('div');
+      note.className = 'pub-note';
+      note.textContent = "🏠 Sur l'accueil jusqu'au " + fmtDate(f.published.until);
+      info.appendChild(note);
+    }
 
     const actions = document.createElement('div');
     actions.className = 'file-actions';
+
     const dl = document.createElement('a');
     dl.className = 'btn btn-blue btn-sm';
     dl.textContent = 'Télécharger';
     dl.href = f.downloadUrl;
     dl.setAttribute('download', f.name);
+    actions.appendChild(dl);
+
+    const pub = document.createElement('button');
+    pub.type = 'button';
+    pub.className = 'btn btn-gold btn-sm';
+    pub.textContent = f.published ? "Changer la durée" : "Mettre à l'accueil";
+    pub.addEventListener('click', () => openPublish(f));
+    actions.appendChild(pub);
+
+    if (f.published) {
+      const un = document.createElement('button');
+      un.type = 'button';
+      un.className = 'btn btn-outline btn-sm';
+      un.textContent = "Retirer de l'accueil";
+      un.addEventListener('click', () => unpublish(f));
+      actions.appendChild(un);
+    }
+
     const del = document.createElement('button');
     del.type = 'button';
     del.className = 'btn btn-danger btn-sm';
     del.textContent = 'Supprimer';
     del.addEventListener('click', () => removeFile(f));
-    actions.append(dl, del);
+    actions.appendChild(del);
 
     card.append(badge, info, actions);
     return card;
   }
 
-  async function removeFile(f) {
-    if (!confirm('Supprimer « ' + f.name + ' » définitivement ?')) return;
-    let pwd = localStorage.getItem('doc_pwd') || '';
-    if (!pwd) {
-      pwd = prompt('Mot de passe :') || '';
-      if (!pwd) return;
+  // Appel protégé : si le mot de passe est refusé, on reverrouille la liste
+  async function authed(url, opts) {
+    const res = await fetch(url, Object.assign({}, opts, {
+      headers: Object.assign({ 'x-admin-password': getPwd() }, (opts && opts.headers) || {}),
+    }));
+    if (res.status === 401) {
+      localStorage.removeItem(PWD_KEY);
+      showLocked('Mot de passe incorrect.');
+      $('pubModal').hidden = true;
     }
+    return res;
+  }
+
+  async function removeFile(f) {
+    if (!confirm('Supprimer « ' + f.name + ' » définitivement ?' + (f.published ? "\nSa copie sur l'accueil sera aussi retirée." : ''))) return;
     try {
-      const res = await fetch('/api/files?path=' + encodeURIComponent(f.pathname), {
-        method: 'DELETE',
-        headers: { 'x-admin-password': pwd },
-      });
-      if (res.status === 401) {
-        localStorage.removeItem('doc_pwd');
-        alert('Mot de passe incorrect.');
-        return;
-      }
+      const res = await authed('/api/files?path=' + encodeURIComponent(f.pathname), { method: 'DELETE' });
+      if (res.status === 401) return;
       if (!res.ok) { alert('Erreur lors de la suppression.'); return; }
-      localStorage.setItem('doc_pwd', pwd);
+      loadFiles();
+    } catch (e) { alert('Erreur réseau.'); }
+  }
+
+  async function unpublish(f) {
+    if (!confirm("Retirer « " + f.name + " » de l'accueil ? L'original reste dans ta liste.")) return;
+    try {
+      const res = await authed('/api/files?path=' + encodeURIComponent(f.published.pathname), { method: 'DELETE' });
+      if (res.status === 401) return;
+      if (!res.ok) { alert('Erreur.'); return; }
+      loadFiles();
+    } catch (e) { alert('Erreur réseau.'); }
+  }
+
+  /* ───────────── Mettre à l'accueil (avec durée) ───────────── */
+  let pubTarget = null;
+
+  function openPublish(f) {
+    pubTarget = f;
+    $('pubFile').textContent = f.name.replace(/_/g, ' ');
+    $('pubDur').value = '24';
+    $('pubCustom').value = '';
+    $('pubCustomRow').hidden = true;
+    $('pubStatus').textContent = '';
+    $('pubModal').hidden = false;
+  }
+  $('pubDur').addEventListener('change', () => { $('pubCustomRow').hidden = $('pubDur').value !== 'custom'; });
+  $('pubCancel').addEventListener('click', () => { $('pubModal').hidden = true; });
+  $('pubModal').addEventListener('click', (e) => { if (e.target === $('pubModal')) $('pubModal').hidden = true; });
+
+  $('pubOk').addEventListener('click', async () => {
+    if (!pubTarget) return;
+    const st = $('pubStatus');
+    let hours;
+    if ($('pubDur').value === 'custom') {
+      const days = parseInt($('pubCustom').value, 10);
+      if (!(days >= 1 && days <= 365)) { st.textContent = 'Entre un nombre de jours entre 1 et 365.'; st.className = 'err'; return; }
+      hours = days * 24;
+    } else hours = Number($('pubDur').value);
+
+    $('pubOk').disabled = true;
+    st.textContent = 'Publication...';
+    st.className = 'info';
+    try {
+      const res = await authed('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: pubTarget.pathname, hours }),
+      });
+      if (res.status === 401) return;
+      if (!res.ok) {
+        let msg = 'Erreur lors de la publication.';
+        try { msg = (await res.json()).error || msg; } catch (e) {}
+        throw new Error(msg);
+      }
+      $('pubModal').hidden = true;
       loadFiles();
     } catch (e) {
-      alert('Erreur réseau.');
+      st.textContent = '❌ ' + e.message;
+      st.className = 'err';
+    } finally {
+      $('pubOk').disabled = false;
     }
-  }
+  });
 
   loadFiles();
 </script>
